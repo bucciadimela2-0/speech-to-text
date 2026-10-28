@@ -1,0 +1,33 @@
+{
+  "editor.formatOnSave": true,
+
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[django-html]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "monosans.djlint"
+  },
+
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "mypy-type-checker.cwd": "${workspaceFolder}",
+  "djlint.configuration": "${workspaceFolder}/pyproject.toml",
+  "djlint.showInstallError": false,
+}

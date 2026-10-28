@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "ms-python.python",
+    "charliermarsh.ruff",
+    "ms-python.mypy-type-checker",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "rvest.vs-code-prettier-eslint",
+    "junstyle.vscode-django-support",
+    "monosans.djlint",
+    "matthewpi.caddyfile-support",
+    "nefrob.vscode-just-syntax"
+  ]
+}

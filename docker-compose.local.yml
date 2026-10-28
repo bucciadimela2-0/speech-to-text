@@ -1,0 +1,75 @@
+name: speech-to-text
+
+volumes:
+  pgdata:{}
+  audio:{}
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - .envs/local/.postgres
+      - .envs/local/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro #todo
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appunti -d appunti"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    profiles: ["app"]
+    build: ./api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .envs/local/.env
+    volumes:
+      - audio:/data/audio
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  worker-ffmpeg:
+    profiles: ["app"]
+    build: ./api
+    command: procrastinate-worker --queue preparazione
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .envs/local/.env
+    volumes:
+      - audio:/data/audio
+    cpus: 2.0
+
+
+  worker-api:
+    profiles: ["app"]
+    build: ./api
+    command: procrastinate-worker --queue trascrizione,riassunto
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - .envs/local/.postgres
+    volumes:
+      - audio:/data/audio
+
+  web:
+    profiles: ["app"]
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm dev --host 0.0.0.0"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    ports:
+      - "127.0.0.1:4321:4321"
+    environment:
+      PUBLIC_API_URL: http://localhost:8000
+
+

@@ -1,0 +1,33 @@
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.uv-cache/
+*.egg-info/
+
+# test e cache
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# node
+node_modules/
+.pnpm-store/
+dist/
+.astro/
+*.log
+
+# audio e dati locali
+fixtures/**/*.m4a
+fixtures/**/*.mp3
+fixtures/**/*.wav
+data/
+*.sqlite
+*.db
+
+# os
+.DS_Store

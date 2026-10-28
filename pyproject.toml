@@ -1,0 +1,177 @@
+[project]
+name = "appunti-api"
+version = "0.1.0"
+description = "Upload audio di lezioni, trascrizione e appunti strutturati"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "alembic",
+    "psycopg[binary]",
+    "procrastinate[psycopg]",
+    "pydantic",
+    "pydantic-settings",
+    "httpx",
+    "python-multipart",
+    "argon2-cffi",
+    "itsdangerous",
+    "structlog",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "mypy",
+]
+
+# Non pubblichiamo un package: niente build backend, niente setuptools
+[tool.uv]
+package = false
+
+# ---------------------------------------------------------------
+# mypy
+# ---------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_return_any = true
+no_implicit_optional = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# ---------------------------------------------------------------
+# ruff
+# ---------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+  "F",    # pyflakes
+  "E4",   # pycodestyle: import
+  "E7",   # pycodestyle: statement
+  "E9",   # pycodestyle: runtime (E501 lo gestisce il formatter)
+  "W",    # pycodestyle warnings
+  "C90",  # mccarthy: complessita'
+  "I",    # isort
+  "N",    # pep8-naming
+  "UP",   # pyupgrade
+  "YTT",  # flake8-2020
+  "ASYNC",# flake8-async
+  "S",    # flake8-bandit
+  "BLE",  # flake8-blind-except
+  "FBT",  # flake8-boolean-trap
+  "B",    # flake8-bugbear
+  "A",    # flake8-builtins
+  "COM",  # flake8-commas
+  "C4",   # flake8-comprehensions
+  "DTZ",  # flake8-datetimez
+  "T10",  # flake8-debugger
+  "EM",   # flake8-errmsg
+  "EXE",  # flake8-executable
+  "FA",   # flake8-future-annotations
+  "ISC",  # flake8-implicit-str-concat
+  "ICN",  # flake8-import-conventions
+  "G",    # flake8-logging-format
+  "INP",  # flake8-no-pep420
+  "PIE",  # flake8-pie
+  "T20",  # flake8-print
+  "PYI",  # flake8-pyi
+  "PT",   # flake8-pytest-style
+  "Q",    # flake8-quotes
+  "RSE",  # flake8-raise
+  "RET",  # flake8-return
+  "SLF",  # flake8-self
+  "SLOT", # flake8-slots
+  "SIM",  # flake8-simplify
+  "TID",  # flake8-tidy-imports
+  "TC",   # flake8-type-checking (TCH nelle versioni vecchie)
+  "INT",  # flake8-gettext
+  "PTH",  # flake8-use-pathlib
+  "ERA",  # eradicate
+  "PD",   # pandas-vet
+  "PGH",  # pygrep-hooks
+  "PL",   # pylint
+  "TRY",  # tryceratops
+  "FLY",  # flynt
+  "PERF", # perflint
+  "RUF",  # ruff-specific
+  # "D",    # docstring: rimandato, il codice e' ancora solo mio
+]
+
+ignore = [
+  "PGH004",  # noqa specifici: uso i codici
+  "ISC001",  # conflitto noto con il formatter
+  "SIM102",  # a volte annidare e' piu' leggibile
+  "PLR0913", # limite numero argomenti
+  "BLE001",  # catch generico: ammesso, con logging
+  "RET504",  # assegnazione prima del return
+  "G004",    # logging con f-string
+  "COM812",  # virgola finale: la gestisce il formatter
+  "TRY003",  # messaggi d'errore lunghi inline
+  "PLR2004", # numeri magici: frequenti nel dominio audio
+]
+
+# S101 escluso solo nei test, non globalmente
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "S101",  # assert nei test
+  "S105",  # stringhe che sembrano password
+  "S106",  # password hardcoded negli argomenti
+  "PLR2004",
+]
+"alembic/versions/**" = [
+  "D",     # docstring autogenerate
+  "E501",  # righe lunghe
+  "TC",    # import di tipi
+  "PLR2004",
+]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+explicit-preview-rules = false
+preview = false
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
+
+[tool.ruff.lint.isort]
+force-single-line = false
+combine-as-imports = true
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# ---------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = [
+  "error::DeprecationWarning",
+  "error::PendingDeprecationWarning",
+]
+addopts = "-q --strict-markers"
+markers = [
+  "slow: test lunghi (audio, ffmpeg)",
+  "integration: richiede servizi esterni",
+]
